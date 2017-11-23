@@ -133,3 +133,5 @@ ENV/
 # mypy
 .mypy_cache/
 
+/cmake-build-debug
+.idea
