@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>rbe500handson</name>
+  <name>RBE500-HandsOn</name>
   <version>0.0.0</version>
-  <description>The rbe500handson package</description>
+  <description>The RBE500-HandsOn package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/rbe500handson</url> -->
+  <!-- <url type="website">http://wiki.ros.org/RBE500-HandsOn</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
