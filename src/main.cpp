@@ -3,9 +3,17 @@
 //
 
 #include <iostream>
+#include <time.h>
 #include "opencv2/opencv.hpp"
 #include "ros/ros.h"
-#include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
+
+bool startFaceDetection = false;
+bool findingValidFace = true;
+
+void startHandler(const std_msgs::Bool::ConstPtr& msg){
+    startFaceDetection = true;
+}
 
 int main(int argc, char* argv[]){
 
@@ -13,32 +21,57 @@ int main(int argc, char* argv[]){
 
     ros::NodeHandle n;
 
-    ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+    ros::Publisher unlock_pub = n.advertise<std_msgs::Bool>("unlock", 1000);
+    ros::Subscriber start_sub = n.subscribe<std_msgs::Bool>("startFaceDetection", 1000, startHandler);
 
     ros::Rate loop(10);
 
+    cv::CascadeClassifier classifier = cv::CascadeClassifier("haarcascade_frontalface_default.xml");
+    cv::VideoCapture cap = cv::VideoCapture(0);
+
     int count = 0;
-    while(ros::ok()){
-        std_msgs::String msg;
+    while( ros::ok() ){
+        if(startFaceDetection){
 
-        std::stringstream ss;
-        ss << "hello world " << count;
-        msg.data = ss.str();
+            ROS_INFO("Started Face Detection");
 
-        ROS_INFO("%s", msg.data.c_str());
+            time_t start = time(0);
+            startFaceDetection = false;
+            findingValidFace = true;
+            while(findingValidFace){
 
-        /**
-         * The publish() function is how you send messages. The parameter
-         * is the message object. The type of this object must agree with the type
-         * given as a template parameter to the advertise<>() call, as was done
-         * in the constructor above.
-         */
-        chatter_pub.publish(msg);
+                ROS_INFO("Trying to find a valid face");
+
+                cv::Mat colorFrame, greyFrame;
+                if(cap.isOpened()){
+                    cap >> colorFrame;
+
+                    cv::cvtColor(colorFrame, greyFrame, CV_BGR2GRAY);
+
+                    std::vector<cv::Rect> foundFaces;
+
+                    classifier.detectMultiScale(greyFrame, foundFaces);
+
+                    if (foundFaces.size() > 0) {
+                        std_msgs::Bool msg;
+                        msg.data = true;
+                        unlock_pub.publish(msg);
+                        findingValidFace = false;
+                    }
+
+                    if( difftime(time(0), start) > 30){
+                        findingValidFace = false;
+                    }
+                } else {
+                    ROS_INFO("Couldn't open the camera");
+                    break;
+                }
+                
+            }
+
+        }
 
         ros::spinOnce();
 
-        count++;
-
-        loop.sleep();
     }
 }
