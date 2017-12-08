@@ -10,11 +10,11 @@ import numpy as np
 import math
 import rospy
 from sensor_msgs.msg import Range
-from std_msgs.msg import Bsool
+from std_msgs.msg import Bool
 from collections import deque
 
-pub = rospy.Publisher('cam_flag', bool, queue_size=10)
-bag=deque(10)
+pub = rospy.Publisher('cam_flag', Bool, queue_size=10)
+bag=[]
 temp=[]
 if __name__ == '__main__':
     try:		
@@ -33,7 +33,10 @@ if __name__ == '__main__':
 def callback(data):
 	if len(temp)<10:
 		temp.append(data.data)
+		if len(temp)==10:
+			bag=deque(temp)
 		return
+		
 	bag.append(data.data)
 	bag.popleft()
 	fvs=apply_wma(bag)
