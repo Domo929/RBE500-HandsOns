@@ -11,40 +11,30 @@ import math
 import rospy
 from sensor_msgs.msg import Range
 from std_msgs.msg import Bool
-from collections import deque
+
 
 pub = rospy.Publisher('cam_flag', Bool, queue_size=10)
 bag=[]
-temp=[]
-if __name__ == '__main__':
-    try:		
-     #  	strl = "Filtering node started "
-      #  rospy.loginfo(strl)      
-        listener()
-    except rospy.ROSInterruptException:
-           pass
 
-
- def talker(flag):
-       	   rate = rospy.Rate(10) # 10hz
+def talker(flag):
            pub.publish(flag)
-           #rate.sleep()
 
 def callback(data):
-	if len(temp)<10:
-		temp.append(data.data)
-		if len(temp)==10:
-			bag=deque(temp)
-		return
-		
-	bag.append(data.data)
-	bag.popleft()
-	fvs=apply_wma(bag)
-	cam=False
-	for e in fws:
-		if e<38:
-			cam=True
-	talker(cam)
+	  if rospy.is_shutdown():
+		  if len(bag)<10:
+		    bag.append(data)
+		    return
+
+		  bag.append(data)
+		  bag.pop(0)
+		  fvs=apply_wma(bag)
+		  cam=False
+
+		  if fvs<38:
+		      cam=True
+
+		  print(cam)
+		  talker(cam)
 
 def listener():
     
@@ -88,19 +78,20 @@ def create_Gaussian_filter(n,sig):
     return x/sum(x)
     
     
-def apply_wma(y,n=5):
-    y2=[]
-    
-
-    for i in range(len(y)):
-        w=[]
-        if i>=n-1:
-            for t in range(n):
-               w.append((2*(t+1)/n/(n+1))*y[i-t])
-            y2.append( sum(w))
-        else:
-            y2.append(y[i])
-    return y2
+def apply_wma(y):
+    s=0
+    n=len(y)
+    for i in range(n):
+	  #print(2*y[i]*(i+1)/n/(n+1))
+          s=s+2*y[i]*(i+1)/n/(n+1)
+    return s
 
 
-        
+if __name__ == '__main__':
+    try:		
+      strl = "Filtering node started "
+      rospy.loginfo(strl)      
+      listener()
+    except rospy.ROSInterruptException:
+           pass
+
