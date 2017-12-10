@@ -207,9 +207,9 @@ ELSE(OpenCV_FOUND)
     MESSAGE(FATAL_ERROR "Did not find OpenCV")
 ENDIF()
 
-add_executable(FaceDetection
-               src/main.cpp)
+add_executable(OpenCVFaceDetection
+				src/givenFaceDetect.cpp)
 
-target_link_libraries(FaceDetection
-                      ${catkin_LIBRARIES}
-                      ${OpenCV_LIBS})
+target_link_libraries(OpenCVFaceDetection
+						${catkin_LIBRARIES}
+                    	${OpenCV_LIBS})
