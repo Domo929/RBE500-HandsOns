@@ -18,7 +18,7 @@
 
 //Sets LED to HIGH value when message comes in
 void handleUnlock(const std_msgs::Bool &msg){
-  digitalWrite(3, unlockLED);
+  digitalWrite(DOOR_UNLOCK_PIN, HIGH);
 }
 
 //Object Instansiations 
@@ -75,7 +75,7 @@ void loop() {
     button.publish(&buttonState);
     
     //reset unlocked status
-    unlockLED = LOW;
+    digitalWrite(DOOR_UNLOCK_PIN, LOW);
   }
   
   //delay half a second so as to not spam the filter node
