@@ -78,7 +78,7 @@ void loop() {
     digitalWrite(DOOR_UNLOCK_PIN, LOW);
   }
   
-  //delay half a second so as to not spam the filter node
-  delay(500);
+//  //delay half a second so as to not spam the filter node
+//  delay(500);
 
 }
